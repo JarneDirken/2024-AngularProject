@@ -1,0 +1,6 @@
+::ng-deep .success-snackbar {
+    --mdc-snackbar-container-color: #42A948 !important;
+    --mdc-snackbar-supporting-text-color: white !important;
+    --mat-mdc-snack-bar-button-color: white !important;
+    white-space: pre-wrap;
+}

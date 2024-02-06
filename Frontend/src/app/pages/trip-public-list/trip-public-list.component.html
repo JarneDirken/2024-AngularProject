@@ -1,0 +1,82 @@
+<div *ngIf="loading" class="overlay">
+  <div class="spinner-container">
+    <i class="fa fa-spinner spinner text-4xl text-primary"></i>
+  </div>
+</div>
+<div class="container mx-auto mt-4 p-4 w-5/6">
+
+  <!-- error message -->
+  <div class="rounded p-4 mb-4 text-lg bg-red-200 text-red-800 border-2 border-red-300" *ngIf="errorMessage">
+    {{errorMessage}}
+  </div>
+
+  <!-- Top section -->
+  <div class="mb-4">
+
+    <!-- Title -->
+    <div class="flex justify-between">
+      <h1 class="text-4xl font-bold">Public Trips</h1>
+    </div>
+
+    <div class="mt-4">
+      <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only">Search</label>
+      <div class="relative flex">
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+          <i class="fa-solid fa-magnifying-glass text-gray-500"></i>
+        </div>
+        <input [(ngModel)]="searchTerm" (input)="searchTrips()" name="searchTerm" type="search" id="default-search"
+          class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50"
+          placeholder="Search trips, activities..." required>
+        <div class="flex justify-end">
+          <select (change)="filterTripType($event)" [(ngModel)]="selectedTripType"
+            class="block p-4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 ">
+            <option [value]="undefined" selected>Select a type</option>
+            <option name="tripType" *ngFor="let tripType of tripTypes" [value]="tripType">
+              {{ tripDetails[tripType].name }}
+            </option>
+          </select>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Trip list -->
+  <div class="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+    <div *ngFor="let trip of publicTrips"
+      class="w-full min-h-[278px] rounded-2xl overflow-hidden shadow hover:shadow-md transition-all">
+      <div>
+        <!-- Image Section (2/3 height) -->
+        <div>
+          <!-- Assuming you have an image property in your trip object -->
+          <img src="{{trip.image}}" alt="{{ trip.name }}" class="w-full h-36 object-cover" />
+        </div>
+        <!-- Content Section (1/3 height) -->
+        <div class="h-1/3 p-4">
+          <div class=" mb-1 flex flex-row justify-between">
+            <span class="font-bold text-xl">{{ trip.name }}</span>
+            <div class="flex flex-row items-center" matTooltip="Views" matTooltipPosition="left">
+              <i class="fa fa-eye" aria-hidden="true"></i>&nbsp;
+              <span class="text-lg"><b>{{trip.count}}</b></span>
+            </div>
+          </div>
+          <div class="flex flex-row justify-between">
+            <div class="flex flex-col">
+              <span class="text-sm font-bold">
+                <i class="fa-regular fa-calendar text-secondary text-base pr-1"></i>
+                {{formatDate(trip.start)}} - {{formatDate(trip.end)}}
+              </span>
+              <span class="text-sm font-semibold"><i
+                  class="fa fa-map-pin text-secondary text-base pr-3"></i>{{trip.location}}</span>
+              <span class="text-sm font-semibold">Amount of activities: {{trip.activities.length}}</span>
+            </div>
+            <button routerLink="/trip/{{trip.id}}" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+              class="mr-0 px-6 py-1 rounded-md bg-accent text-white hover:scale-105 transition-transform duration-200 cursor-pointer h-10 self-end">
+              View
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

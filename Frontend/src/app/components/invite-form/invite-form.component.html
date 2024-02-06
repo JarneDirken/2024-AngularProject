@@ -1,0 +1,49 @@
+<div class="container mx-auto m-4 px-8 pt-4">
+
+  <!-- Form -->
+  <form #inviteForm="ngForm">
+
+    <!-- Input for email -->
+    <label for="user" class="block ml-1 mb-2 text-sm font-bold text-gray-900">Email: </label>
+    <div class="flex mb-5">
+      <input type="email" id="user" name="user"
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-fit p-2.5"
+        placeholder="example@gmail.com" [(ngModel)]="newFriendEmail"  #user="ngModel" [email]="true">
+        <div class="flex w-4/12 ml-5">
+          <button type="button" matTooltip="Add user"
+          [disabled]="!inviteForm.form.valid"
+          class="text-white bg-primary focus:ring-4 font-medium rounded-lg text-sm sm:w-auto px-5 text-center disabled:opacity-75 transform hover:opacity-90 transition-transform duration-200"
+          (click)="addFriend()">
+          <i class="fa-solid fa-plus"></i>
+          </button>
+    </div>    
+  </div>
+  <span class="text-red-500" *ngIf="user.errors?.['email']">Email is not valid</span>
+
+  <!-- Error message -->
+  <div class="rounded p-4 mb-4 text-lg bg-red-200 text-red-800 border-2 border-red-300 mt-4" *ngIf="errorMessage">
+    {{errorMessage}}
+  </div>
+
+  <!-- List of email addresses added to the trip -->
+  <div *ngIf="trip.users" class="mt-4">
+    <h1 *ngIf="trip.users.length > 0" class="text-2xl mb-3 font-bold">Invited users:</h1>
+    @for (user of trip.users; track $index) {
+    <div class="flex justify-between mb-2">
+      <span class="mt-2">{{user.email}}</span>
+      <button type="button" matTooltip="Remove user"
+        class="text-white bg-accent focus:ring-4  font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center disabled:opacity-75 transform hover:scale-105 transition-transform duration-200"
+        (click)="removeFriend($index)"><i class="fa-solid fa-minus"></i></button>
+    </div>
+    }
+  </div>
+  
+  <!-- Buttons -->
+  <div class="flex justify-center mt-8">
+    
+    <button [mat-dialog-close]="false"
+      class="border border-zinc-500 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center disabled:opacity-75 transform hover:opacity-75 transition-transform duration-200">Close</button>
+  </div>
+  </form>
+
+</div>

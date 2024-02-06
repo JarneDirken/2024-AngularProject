@@ -1,0 +1,175 @@
+<div *ngIf="loading" class="overlay">
+  <div class="spinner-container">
+    <i class="fa fa-spinner spinner text-4xl text-primary"></i>
+  </div>
+</div>
+<div class="mx-auto mt-16 px-8 sm:w-11/12 lg:w-5/6">
+  <div class="absolute z-[-1] top-0 left-0 w-full blur-[3px]">
+    <img src="{{ trip.image }}" alt="Destination Image" class="object-cover w-full h-64">
+  </div>
+  <app-progress-bar *ngIf="this.trip.cost" [progressSpeed]="progressSpeed" [progressValue]="progress"
+    matTooltip=" {{currencySymbols[trip.cost.currency!]}} {{sumCosts}} /  {{currencySymbols[trip.cost.currency!]}} {{trip.cost.amount}}">
+  </app-progress-bar>
+
+  <!-- error message -->
+  <div class="rounded p-4 mb-4 text-lg bg-red-200 text-red-800 border-2 border-red-300" *ngIf="errorMessage">
+    {{errorMessage}}
+  </div>
+
+  <!-- Top section -->
+  <div class="bg-white p-8 rounded-xl shadow-xl mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-3">
+      <!-- Title -->
+      <div class="sm:col-span-2 order-2 sm:order-1">
+        <h1 class="text-3xl mr-5 mb-3 font-bold">{{trip.name}} - {{trip.location}}</h1>
+      </div>
+      @if (userId === trip.userId) {
+      <div class="sm:col-span-1 flex justify-end order-1 sm:order-2">
+        <a (click)="editThisTrip()" matTooltip="Edit this trip"
+          class="mr-2 text-primary hover:text-green-600 cursor-pointer">
+          <i class="fa-solid fa-pen-to-square text-lg"></i>
+        </a>
+        <a (click)="deleteThisTrip()" matTooltip="Delete this trip"
+          class="mr-0 text-accent hover:text-red-600 cursor-pointer"><i class="fa-solid fa-trash-can text-lg"></i>
+        </a>
+      </div>
+      }
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2">
+
+
+      <!-- Dates section -->
+      <div>
+        <span class="inline-block pr-1 py-1 text-sm font-semibold mr-1 mb-2">
+          <i class="fa-regular fa-calendar text-primary text-xl"></i>
+          {{formattedStart}}
+        </span>
+        <span class="mr-1 font-bold mt-2">-</span>
+        <span class="inline-block px-1 py-1 text-sm font-semibold mr-1 mb-2">
+          {{formattedEnd}}
+        </span>
+        <div *ngIf="trip.type!==undefined" class="text-sm font-semibold">
+          <b>{{tripDetails[trip.type].name}} </b> <i class="fa-solid {{tripDetails[trip.type].icon}}"></i>
+        </div>
+        <div>
+          <p *ngIf="this.trip.cost">Your total budget is: {{currencySymbols[trip.cost.currency!]}} {{trip.cost.amount}}
+          </p>
+          <p *ngIf="this.trip.cost">The total activities cost is: {{currencySymbols[trip.cost.currency!]}} {{sumCosts}}
+          </p>
+        </div>
+
+        <!-- Shared with list: -->
+        @if (userId === trip.userId || userEmails.includes(loggedInUser!.email!) ) {
+        <div class="text-sm text-gray-900 mb-2">
+          <ng-container *ngIf="trip.users && trip.users.length; else noUser">
+            Shared with:
+            <ng-container *ngFor="let user of trip.users; let last = last">
+              {{ user.email }}{{ !last ? ', ' : '' }}
+            </ng-container>
+          </ng-container>
+          <ng-template #noUser>Shared with nobody</ng-template>
+        </div>
+        }
+      </div>
+      <!-- Spacer -->
+      <!-- <div class="flex-grow"></div> -->
+      <div class="flex flex-row flex-wrap justify-end items-end">
+        <!-- Group 1 -->
+        @if (userId === trip.userId) {
+        <div class="mr-2">
+          <button *ngIf="!this.trip.isPublic" (click)="publish(trip.id)" matTooltip="Share with everyone"
+            class="px-4 py-2 rounded-3xl bg-accent text-white text-xs hover:scale-105 transition-transform duration-200 cursor-pointer">Publish
+          </button>
+        </div>
+
+        <div *ngIf="this.trip.isPublic" class="mr-2">
+          <button *ngIf="this.trip.isPublic" (click)="unpublish(trip.id)"
+            class="px-4 py-2 rounded-3xl bg-accent text-white text-xs hover:scale-105 transition-transform duration-200 cursor-pointer">Unpublish
+          </button>
+        </div>
+        }
+        @if (userId === trip.userId) {
+        <div class="mr-2">
+          <button matTooltip="Add friends or family!"
+            class="px-4 py-2 rounded-3xl bg-accent text-white text-xs hover:scale-105 transition-transform duration-200 cursor-pointer"
+            (click)="invite()">Invite</button>
+        </div>
+        }
+
+        <!-- Group 2 -->
+        <div>
+          <button matTooltip="Your trips"
+            class="px-4 py-2 rounded-3xl bg-accent text-white text-xs hover:scale-105 transition-transform duration-200"
+            (click)="back()">Back</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity list -->
+  <div *ngIf="trip" class="grid grid-cols-1 md:grid-cols-2 md:gap-6 xl:grid-cols-3 lg:gap-4 mb-8 gap-8">
+    <div *ngFor="let act of trip.activities"
+      class="w-full rounded-2xl shadow-lg flex flex-col justify-between pl-4 pt-4 pb-4 bg hover:shadow-xl min-h-[220px]">
+      <div class="mb-3 flex justify-between">
+
+        <!-- Activity name -->
+        <span
+          class="mr-3 font-bold text-xl">{{ act.name.length > 26 ? act.name.substring(0, 23) + '...' : act.name }}</span>
+        <!-- Buttons -->
+        <div class="flex flex-row justify-end">
+
+          @if (userId === trip.userId || userEmails.includes(loggedInUser!.email!) ) {
+          <!-- Edit button -->
+          <a (click)="edit(act.id)" matTooltip="Edit this activity"
+            class="text-primary hover:text-green-600 cursor-pointer mr-2">
+            <i class="fa-solid fa-pen-to-square text-lg"></i>
+          </a>
+
+          <!-- Delete button -->
+          <a (click)="delete(act.id)" matTooltip="Delete this activity"
+            class="text-accent hover:text-red-600 cursor-pointer mr-4">
+            <i class="fa-solid fa-trash-can text-lg"></i>
+          </a>
+          }
+
+        </div>
+
+      </div>
+
+      <div class="mb-3 pr-5 grid grid-cols-1">
+        <div class="">
+          <p>Type: {{act.activityType.name}}</p>
+          <p *ngIf="act.cost">Cost: {{currencySymbols[trip.cost?.currency!]}} {{act.cost.amount}}</p>
+        </div>
+        <div>
+          <span class="inline-block pr-1 py-1 text-sm font-semibold mr-1">
+            <i class="fa-regular fa-calendar text-primary text-xl"></i>
+            {{formatDate(act.start)}}
+          </span>
+          <span class="mr-1 font-bold">-</span>
+          <span class="inline-block pl-1 py-1 text-sm font-semibold mr-1">
+            {{formatDate(act.end)}}
+          </span>
+        </div>
+        <div class="flex flex-col">
+          <span class="inline-block text-sm"><i class="fa fa-map-pin text-primary text-xl pr-1"></i>
+            {{act.location}}</span>
+          <span class="inline-block text-sm" *ngIf="act.description && act.description.trim() !== ''">
+            <i class="fa fa-comment text-primary text-xl"></i>
+            {{ act.description.length > 100 ? act.description.substring(0, 97) + '...' : act.description }}
+          </span>
+        </div>
+      </div>
+    </div>
+    @if (userId === trip.userId || userEmails.includes(loggedInUser!.email!) ) {
+    <div class="relative" matTooltip="Add a new activity">
+      <button (click)="add()"
+        class="text-white hover:scale-[1.02] transition-transform duration-200 cursor-pointer w-full h-[220px] bg-gray-800 bg-opacity-10 rounded-2xl shadow-lg">
+      </button>
+      <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <i class="fa fa-plus text-secondary text-3xl"></i>
+      </div>
+    </div>
+    }
+  </div>
+</div>

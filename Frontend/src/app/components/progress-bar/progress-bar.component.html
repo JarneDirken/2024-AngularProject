@@ -1,0 +1,10 @@
+<div>
+    <div class="progress-container my-5 relative">
+        <div class="progress-bar" [style.width.%]="progressChange" [ngClass]="{'over-limit' : progressValue > 100}"> 
+          <div></div>
+        </div>
+        
+      <span class="inner text-opacity"><span class="font-bold">{{ progressValue % 1 === 0 ? progressValue : progressValue | number: '1.2-2' }}%</span> Budget used</span>
+    </div>
+</div>
+  

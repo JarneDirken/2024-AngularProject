@@ -1,0 +1,152 @@
+<div class="min-h-screen px-12">
+  <form #tripForm="ngForm">
+    <div class="md:grid md:grid-cols-2 gap-12">
+      <div class="lg:w-3/4 md:mx-auto">
+        <div class="mx-auto pt-8 text-left mb-8">
+          <h1 class="text-4xl font-bold w-full">
+            Where are you going <span class="text-4xl text-primary ">{{ Capitalize(loggedInUser?.name) }}</span>?
+          </h1>
+          <h1 class="w-full">
+
+          </h1>
+          <p
+            class="mt-3 max-w-md text-base text-gray-500 sm:mt-5 sm:text-base md:mt-5 md:text-lg lg:mx-0 xl:max-w-xl xl:text-xl">
+            Plan your next beautiful trip
+          </p>
+        </div>
+        <div class="mx-auto mb-6">
+          <div class="mb-6">
+            <p class="w-full text-base text-black">Trip name</p>
+            <input type="name" id="name" name="name"
+              class="block w-full p-4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 h-12"
+              placeholder="Name" required [(ngModel)]="trip.name" #name="ngModel">
+            <div [hidden]="name.valid || name.pristine" class="text-red-500 mt-2">Name is required</div>
+          </div>
+          <div class="mb-4">
+            <p class="w-full text-base text-black">Where to?</p>
+            <div class="relative">
+              <div class="flex items-center">
+                <div class="absolute right-8">
+                  <i *ngIf="!fromValue" class="fa-solid fa-magnifying-glass text-gray-400 text-lg"></i>
+                </div>
+                <app-place-autocomplete (placeChanged)="fromValue = $event" placeholder="Destination"
+                  class="text-gray-900 text-sm rounded-lg block w-full border border-gray-300"
+                  [(ngModel)]="trip.location" #location="ngModel" name="location" id="location" required />
+              </div>
+              <div [hidden]="location.valid || location.pristine" class="text-red-500 mt-2">Destination is required
+              </div>
+            </div>
+          </div>
+          <div>
+            <p class="w-full text-base text-black">Dates</p>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="relative">
+                <div class="flex items-center">
+                  <div class="absolute start-0">
+                    <mat-datepicker-toggle matTooltip="Select start date" matSuffix [for]="startDatePicker" />
+                    <mat-datepicker #startDatePicker></mat-datepicker>
+                  </div>
+                  <input name="startDate" id="startDate" matinput [matDatepicker]="startDatePicker" readonly
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full h-12 ps-12 p-2.5"
+                    placeholder="Select start date" required [(ngModel)]="trip.start" #startDate="ngModel">
+                </div>
+                <div [hidden]="startDate.valid || startDate.pristine" class="text-red-500 mt-2"
+                  *ngIf="startDate.touched && startDate.invalid">Start Date is required</div>
+              </div>
+              <div class="relative">
+                <div class="flex items-center">
+                  <div class="absolute start-0">
+                    <mat-datepicker-toggle matTooltip="Select end date" matSuffix [for]="endDatePicker" />
+                    <mat-datepicker #endDatePicker></mat-datepicker>
+                  </div>
+                  <input name="endDate" id="endDate" matinput [matDatepicker]="endDatePicker" readonly
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full h-12 ps-12 p-2.5"
+                    placeholder="Select end date" required [(ngModel)]="trip.end" #endDate="ngModel">
+                </div>
+                <div [hidden]="endDate.valid || endDate.pristine" class="text-red-500 mt-2"
+                  *ngIf="endDate.touched && endDate.invalid">End Date is required</div>
+              </div>
+            </div>
+            <div *ngIf="startDate.valid && endDate.valid && trip.start > trip.end" class="text-red-500 mt-2">Start date
+              can't be later than the end date</div>
+          </div>
+        </div>
+
+
+        <div class="my-5">
+          <p class="w-full text-base text-black">Select a type:</p>
+          <select name="type" (change)="selectTripType($event)" [(ngModel)]="selectedTripType"
+            class="block p-4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:border-gray-800 focus:border-2">
+            <option [value]="undefined">Do not specify</option>
+            <option name="tripType" *ngFor="let tripType of tripTypes" [value]="tripType">
+              {{ tripDetails[tripType].name }}
+            </option>
+          </select>
+        </div>
+
+        <div class="my-5">
+          <p class="w-full text-base text-black">Budget? <input type="checkbox" name="isCost" id="isCost"
+              [matTooltip]="isCost ? 'Remove budget': 'Add budget'" [(ngModel)]="isCost"></p>
+          <div class="flex" *ngIf="isCost">
+            <div class="relative">
+              <div class="absolute inset-y-0 start-0 top-0 flex items-center ps-3.5 pointer-events-none">
+                <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M5 2a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1M2 5h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" />
+                </svg>
+              </div>
+              <input name="amount" id="amount" type="number" [disabled]="!isCost" min="1" value="1"
+                class="block p-2.5 w-full z-20 ps-10 text-sm text-gray-900 bg-gray-50 rounded-s-lg border-e-gray-50 border-e-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter budget amount" [(ngModel)]="trip.cost!.amount" #amount="ngModel">
+            </div>
+            <select name="currency" #currency="ngModel" id="currency" required (change)="selectCurrency($event)"
+              [(ngModel)]="+trip.cost!.currency"
+              class="flex-shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-e-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 ">
+              <option class="text-left" name="tripType" *ngFor="let currency of currencies" [value]="currency">
+                {{ currencySymbols[currency]  }}</option>
+            </select>
+            <div [hidden]="amount.valid || amount.pristine" class="text-red-500 mt-2"
+              *ngIf="amount.touched && amount.invalid">Budget amount is required</div>
+            <div [hidden]="currency.valid || currency.pristine" class="text-red-500 mt-2"
+              *ngIf="currency.touched && currency.invalid">Currency is required</div>
+          </div>
+        </div>
+        <div class="display-area flex md:hidden">
+          <app-map-display [from]="fromValue" class="w-full first-map"></app-map-display>
+        </div>
+        <div class="hidden md:block max-w-md mx-auto">
+          <img src="../../assets/images/world.svg" alt="World with woman">
+        </div>
+        <div class="rounded p-4 mb-4 text-lg bg-red-200 text-red-800 border-2 border-red-300"
+          *ngIf="isSubmitted && errorMessage">
+          {{errorMessage}}
+        </div>
+        <div class="mb-12 mx-auto">
+          <a *ngIf="!(auth.isAuthenticated$ | async); else planButton" (click)="auth.loginWithPopup()">
+            <button [disabled]="!tripForm.form.valid || isSubmitted || trip.start > trip.end"
+              [ngClass]="{'hover:scale-105 transition-transform duration-200': tripForm.form.valid}"
+              [class.cursor-not-allowed]="!tripForm.form.valid" [class.cursor-pointer]="tripForm.form.valid"
+              class="flex w-full mx-auto justify-center px-8 py-5 text-xl font-bold md:px-10 md:py-4 md:text-lg md:w-3/4 bg-accent text-white rounded-2xl hover:bg-accent transform">
+              Login to start planning</button>
+          </a>
+          <ng-template #planButton>
+            <button type="submit" (click)="submitForm()"
+              [disabled]="!tripForm.form.valid || isSubmitted || trip.start > trip.end"
+              [ngClass]="{'hover:scale-105 transition-transform duration-200': tripForm.form.valid}"
+              [class.cursor-not-allowed]="!tripForm.form.valid" [class.cursor-pointer]="tripForm.form.valid"
+              class="flex w-full mx-auto justify-center px-8 py-5 text-xl font-bold md:px-10 md:py-4 md:text-lg md:w-3/4 bg-accent text-white rounded-2xl hover:bg-accent transform">
+              Start planning
+            </button>
+          </ng-template>
+        </div>
+      </div>
+      <div>
+        <div class="hidden md:flex flex-col items-start h-full">
+          <div class="p-10 w-full"></div>
+          <app-map-display [from]="fromValue" class="w-full h-3/5"></app-map-display>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

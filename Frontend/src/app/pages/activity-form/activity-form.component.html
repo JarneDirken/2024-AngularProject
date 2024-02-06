@@ -1,0 +1,116 @@
+<div class="container mx-auto mt-8 flex-wrap">
+  <div class="rounded p-4 mb-4 text-lg bg-red-200 text-red-800 border-2 border-red-300"
+    *ngIf="isSubmitted && errorMessage">
+    {{errorMessage}}
+  </div>
+  <div class="flex flex-col md:flex-row w-100 mt-4">
+    <form (ngSubmit)="OnSubmit()" #activityForm="ngForm" class="mx-10 md:w-1/2 mb-8">
+      <div class="flex flex-row justify-between">
+        <h1 class="font-bold text-3xl mb-6">
+          {{ isEdit ? 'Edit an activity' : 'Add an activity' }}
+        </h1>
+        <button matTooltip="Back to your trip"
+          class="mr-0 md:mr-4 px-4 py-2 rounded-md bg-accent text-white hover:scale-105 transition-transform duration-200 cursor-pointer"
+          (click)="back()">
+          Back
+        </button>
+      </div>
+      <div class="mb-6">
+        <label for="name" class="block mb-2 text-sm font-medium text-gray-900 ">Name</label>
+        <input type="name" id="name" name="name"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full h-12 p-2.5 ps-4"
+          placeholder="Name" required [(ngModel)]="activity.name" #name="ngModel">
+        <div [hidden]="name.valid || name.pristine" class="text-red-500 mt-2">Name is required</div>
+      </div>
+
+      <div class="mb-6">
+        <label for="activityType" class="block mb-2 text-sm font-medium text-gray-900">Activity Type</label>
+        <select id="activityType" name="activityType"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full h-12 p-2.5"
+          required [(ngModel)]="activity.activityType.name" #activityType="ngModel">
+          <option *ngFor="let type of activityTypes" [ngValue]="type.name">{{ type.name }}</option>
+        </select>
+      </div>
+      <div class="mb-6" *ngIf="currency != undefined">
+        <p class="w-full text-base text-black">Cost</p>
+        <div class="flex">
+          <div class="relative">
+            <div class="absolute inset-y-0 start-0 top-0 flex items-center ps-3.5 pointer-events-none">
+              <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M5 2a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1M2 5h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" />
+              </svg>
+            </div>
+            <input required name="amount" #amount="ngModel" id="amount" min="0" type="number"
+              class="block p-2.5 w-full z-20 ps-10 text-sm text-gray-900 bg-gray-50 rounded-s-lg border-e-gray-50 border-e-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter cost amount" [(ngModel)]="this.activityCostAmount">
+          </div>
+          <select disabled name="currency" id="currency" (change)="selectCurrency($event)" matTooltip="Your trip budget is in {{currencySymbols[currency]}}"
+            class="flex-shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-e-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 ">
+            <option class="text-left" name="tripType" *ngFor="let c of currencies" [value]="currency">
+              {{ currencySymbols[c]  }}</option>
+          </select>
+        </div>
+        <div [hidden]="amount.valid || amount.pristine" class="text-red-500 mt-2"
+          *ngIf="amount.touched && amount.invalid">Budget amount is required
+        </div>
+      </div>
+
+      <p class="w-full text-base text-black">Dates</p>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div class="relative">
+          <div class="flex items-center">
+            <div class="absolute start-0">
+              <mat-datepicker-toggle matTooltip="Select start date" matSuffix [for]="startDatePicker" />
+              <mat-datepicker #startDatePicker></mat-datepicker>
+            </div>
+            <input name="startDate" id="startDate" matinput [matDatepicker]="startDatePicker" readonly
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full h-12 ps-12 p-2.5"
+              placeholder="Select start date" required [(ngModel)]="activity.start" #startDate="ngModel">
+          </div>
+          <div [hidden]="startDate.valid || startDate.pristine" class="text-red-500 mt-2"
+            *ngIf="startDate.touched && startDate.invalid">Start Date is required</div>
+        </div>
+        <div class="relative">
+          <div class="flex items-center">
+            <div class="absolute start-0">
+              <mat-datepicker-toggle matTooltip="Select end date" matSuffix [for]="endDatePicker" />
+              <mat-datepicker #endDatePicker></mat-datepicker>
+            </div>
+            <input name="endDate" id="endDate" matinput [matDatepicker]="endDatePicker" readonly
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full h-12 ps-12 p-2.5"
+              placeholder="Select end date" required [(ngModel)]="activity.end" #endDate="ngModel">
+          </div>
+          <div [hidden]="endDate.valid || endDate.pristine" class="text-red-500 mt-2"
+            *ngIf="endDate.touched && endDate.invalid">End Date is required</div>
+        </div>
+      </div>
+      <div *ngIf="startDate.valid && endDate.valid && activity.start > activity.end" class="text-red-500 mt-2">Start date can't be later than the end date</div>
+
+      <div class="mb-6">
+        <label for="location" class="block mb-2 text-sm font-medium text-gray-900 ">Location</label>
+        <app-place-autocomplete (placeChanged)="fromValue = $event" placeholder="Location" class="text-gray-900 text-sm rounded-lg block w-full border border-gray-300"
+          [(ngModel)]="activity.location" #location="ngModel" name="location" id="location" required />
+        <div [hidden]="location.valid || location.pristine" class="text-red-500 mt-2">Location is required</div>
+      </div>
+
+      <div class="mb-6">
+        <label for="Description" class="block mb-2 text-sm font-medium text-gray-900 ">Description</label>
+        <input type="name" id="Description" name="Description"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full h-12 p-2.5 ps-4"
+          placeholder="Description" [(ngModel)]="activity.description" #Description="ngModel">
+      </div>
+      <button type="submit" *ngIf="isAdd" [disabled]="!activityForm.form.valid || isSubmitted || activity.start > activity.end"
+        [class.cursor-not-allowed]="!activityForm.form.valid || activity.start > activity.end" [class.cursor-pointer]="activityForm.form.valid" matTooltip="Add and continue"
+        class="flex w-full mx-auto justify-center px-8 py-5 text-xl font-bold md:px-10 md:py-3 md:text-lg md:w-3/4 bg-accent text-white rounded-xl hover:bg-accent transform hover:scale-105 transition-transform duration-100">Add</button>
+      <button type="submit" *ngIf="isEdit" [disabled]="!activityForm.form.valid || isSubmitted || activity.start > activity.end" matTooltip="Save and continue"
+        [class.cursor-not-allowed]="!activityForm.form.valid || activity.start > activity.end" [class.cursor-pointer]="activityForm.form.valid"
+        class="flex w-full mx-auto justify-center px-4 py-4 text-xl font-bold md:px-10 md:py-3 md:text-lg md:w-3/4 bg-accent text-white rounded-xl hover:bg-accent transform hover:scale-105 transition-transform duration-100">Save</button>
+    </form>
+
+    <div class="flex md:w-1/2">
+      <img src="../../assets/images/World-rafiki.svg" class="w-auto h-auto" />
+    </div>
+  </div>
+</div>

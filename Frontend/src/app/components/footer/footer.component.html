@@ -1,0 +1,59 @@
+<footer class="mt-auto bottom-0 left-0 z-20 w-full pt-4 pb-2 px-8 shadow bg-footer">
+  <div class="mx-auto w-full max-w-screen-xl pt-2">
+    <div class="md:flex md:justify-between">
+      <div class="mb-6 md:mb-0 md:w-1/2">
+        <div class="text-center sm:text-left">
+          <a href="#" class="flex items-center justify-center sm:justify-start mb-4">
+            <img src="../../assets/images/travel_planner_logo.svg" class="h-8 mr-3" alt="Trip planner Logo" />
+            <span class="self-center text-2xl font-semibold whitespace-nowrap">Trip planner</span>
+          </a>
+          <span class="text-gray-900">
+            We are Angular Team App 8
+          </span>
+          <hr class="my-2 border-gray-400 sm:mx-auto  sm:hidden" />
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-8 sm:gap-6 md:w-1/2">
+        <!-- Resources -->
+        <div>
+          <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase">Resources</h2>
+          <ul class="text-gray-500 font-medium">
+            <li class="mb-4">
+              <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+                class="hover:underline">Home</a>
+            </li>
+            <li>
+              <a routerLink="/planner" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+                class="hover:underline">Plan trip</a>
+            </li>
+          </ul>
+        </div>
+        <!-- Team's github -->
+        <div>
+          <h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase">Team's github</h2>
+          <ul class="text-gray-500 font-medium">
+            <li class="mb-4">
+              <a href="https://github.com/JarneDirken" target="_blank" class="hover:underline">Jarne</a>
+            </li>
+            <li class="mb-4">
+              <a href="https://github.com/jenverboven" target="_blank" class="hover:underline">Jen</a>
+            </li>
+            <li class="mb-4">
+              <a href="https://github.com/chadiai" target="_blank" class="hover:underline">Chadi</a>
+            </li>
+            <li class="">
+              <a href="https://github.com/SohaibIbenhajene" target="_blank" class="hover:underline">Sohaib</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <hr class="my-2 border-gray-400 sm:mx-auto" />
+    <div class="sm:flex sm:items-center sm:justify-between">
+      <span class="text-sm text-gray-500 text-center mx-auto">© 2023 <a href="#" class="hover:underline">Angular Team
+          8™</a>.
+        All rights reserved.
+      </span>
+    </div>
+  </div>
+</footer>

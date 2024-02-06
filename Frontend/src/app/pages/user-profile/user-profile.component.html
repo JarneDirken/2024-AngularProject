@@ -1,0 +1,103 @@
+<div *ngIf="loading || loadingTripCount" class="overlay">
+  <div class="spinner-container">
+    <i class="fa fa-spinner spinner text-4xl text-primary"></i>
+  </div>
+</div>
+
+<div class="container px-8 mx-auto w-5/6">
+  <div class="flex flex-col items-center justify-center mt-8 mb-4">
+    <img src="{{loggedInUser?.picture}}" class="rounded-full w-24 h-24 object-cover" />
+    <h1 class="text-2xl">{{loggedInUser?.name}}</h1>
+  </div>
+  <div class="flex flex-row items-center justify-center mb-4">
+    <div class="flex flex-col items-center">
+      <p class="uppercase text-sm text-gray-500">Member since</p>
+      <p class="font-bold">{{formatDate(loggedInUser?.created_at)}}</p>
+    </div>
+    <div class="border-r border-gray-500 h-10 mx-4"></div>
+    <div class="flex flex-col items-center mr-10" matTooltip="Create trips to level up!">
+      <p class="uppercase text-sm text-gray-500">User level</p>
+      <p class="font-bold">{{level}} {{userTripCounts?.tripCount}}</p>
+    </div>
+  </div>
+  <div class="mx-auto">
+    <h1 class="text-2xl font-bold">My Trips</h1>
+    <div class="flex">
+      <button
+        class="uppercase my-3 bg-gray-200 hover:text-accent text-primary py-2 px-4 rounded-xl w-1/2 relative"
+        [class.bg-primary]="selectedButton === 'upcoming'" [class.text-white]="selectedButton === 'upcoming'"
+        (click)="toggleButton('upcoming')" [style.marginRight.px]="selectedButton === 'upcoming' ? -20 : 0">
+        Upcoming
+      </button>
+      <button
+        class="uppercase my-3  bg-gray-200 hover:text-accent text-primary py-2 px-4 rounded-xl w-1/2 relative"
+        [class.bg-primary]="selectedButton === 'past'" [class.text-white]="selectedButton === 'past'"
+        (click)="toggleButton('past')" [style.marginLeft.px]="selectedButton === 'past' ? -20 : 0">
+        Past
+      </button>
+    </div>
+  </div>
+  <div class="mt-4 mb-4">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+      <div *ngFor="let trip of (upcoming ? upcomingTrips.slice(0, 3) : pastTrips.slice(0, 3))"
+        class="w-full rounded-2xl overflow-hidden shadow hover:shadow-md transition-all">
+        <div class="">
+          <!-- Image Section (2/3 height) -->
+          <div class="h-2/3">
+            <!-- Assuming you have an image property in your trip object -->
+            <img src="{{trip.image}}" alt="{{ trip.name }}" class="w-full h-40 object-cover" />
+          </div>
+          <!-- Content Section (1/3 height) -->
+          <div class="h-1/3 p-4">
+            <div class=" mb-1 flex flex-row justify-between">
+              <span class="font-bold text-xl">{{ trip.name }}</span>
+              <div class="flex flex-row items-center" matTooltip="Shares" matTooltipPosition="left">
+                <i class="fa fa-bullhorn" aria-hidden="true"></i>&nbsp;
+                <span class="text-lg"><b>{{trip.users?.length}}</b></span>
+              </div>
+            </div>
+            <div class="flex flex-row justify-between">
+              <div class="flex flex-col">
+                <span class="text-sm font-bold"><i class="fa-regular fa-calendar text-primary text-base"></i>
+                  {{ formatDateDate(trip.start) }} - {{ formatDateDate(trip.end) }}</span>
+                <span class="text-sm font-semibold"><i
+                    class="fa fa-map-pin text-primary text-base pr-1"></i>{{trip.location}}</span>
+              </div>
+              <button routerLink="/trip/{{trip.id}}" routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: true }"
+                class="mr-0 px-6 py-1 rounded-md bg-accent text-white hover:scale-105 transition-transform duration-200 cursor-pointer h-10 self-end">
+                View
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- show all button for past trips -->
+      <div *ngIf="!upcoming && pastTrips.length > 3"
+        class="flex justify-center items-center mb-4 mx-auto md:order-2 max-w-[350px] w-[350px]">
+        <button routerLink="/trips/all" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+          class="mr-0 md:mr-4 px-4 py-2 rounded-md bg-accent text-white hover:scale-105 transition-transform duration-200 cursor-pointer">Show
+          All
+          Past Trips</button>
+      </div>
+      <!-- show all button for upcoming trips -->
+      <div *ngIf="upcoming && upcomingTrips.length > 3"
+        class="flex justify-center items-center mb-4 mx-auto md:order-2 max-w-[350px] w-[350px]">
+        <button routerLink="/trips/all" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+          class="mr-0 md:mr-4 px-4 py-2 rounded-md bg-accent text-white hover:scale-105 transition-transform duration-200 cursor-pointer">Show
+          All
+          Upcoming Trips</button>
+      </div>
+
+      <!-- add card -->
+      <div class="relative" matTooltip="Add a new trip!">
+        <button routerLink="/planner" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+          class="text-white hover:scale-[1.02] transition-transform duration-200 cursor-pointer w-full overflow-hidden transition-all bg-gray-800 bg-opacity-10 rounded-2xl shadow md:order-1 h-[274px]">
+        </button>
+        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <i class="fa fa-plus text-secondary text-3xl"></i>
+        </div>
+      </div>
+    </div>
+  </div>

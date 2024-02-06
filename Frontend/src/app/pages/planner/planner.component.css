@@ -1,0 +1,16 @@
+
+.display-area {
+    margin-bottom: 50px;
+}
+
+.first-map{
+    height: 300px;
+}
+
+.ng-valid[required], .ng-valid.required  {
+    border-left: 5px solid #A7C5BF; /* green */
+}
+  
+.ng-dirty:not(form).ng-invalid:not(form) {
+  border-left: 5px solid #705C6A; /* red */
+}

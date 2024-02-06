@@ -1,0 +1,147 @@
+<div class="container mx-auto mt-8 p-4 flex-wrap">
+  <div class="rounded p-4 mb-4 text-lg bg-red-200 text-red-800 border-2 border-red-300"
+    *ngIf="isSubmitted && errorMessage">
+    {{errorMessage}}
+  </div>
+  <div class="flex flex-col md:flex-row w-full mt-4">
+    <form (ngSubmit)="onSubmit()" #tripForm="ngForm" class="md:w-1/2">
+      <div class="flex flex-row justify-between">
+        <h1 class="font-bold text-3xl mb-6">
+          Edit trip
+        </h1>
+        <button
+          class="mr-0 md:mr-4 px-4 py-2 rounded-md bg-accent text-white hover:scale-105 transition-transform duration-200 cursor-pointer"
+          (click)="back()">
+          Back
+        </button>
+      </div>
+      <div class="mb-6">
+        <label for="name" class="block mb-2 text-base text-black">Name</label>
+        <input type="name" id="name" name="name"
+          class="block w-full p-4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Name" required [(ngModel)]="trip.name" #name="ngModel">
+        <div [hidden]="name.valid || name.pristine" class="text-red-500 mt-2">Name is required</div>
+      </div>
+      <div class="mb-4">
+        <p class="w-full text-base text-black">Where to?</p>
+        <div class="relative">
+          <div class="flex items-center">
+            <div class="absolute right-8">
+              <i *ngIf="!fromValue" class="fa-solid fa-magnifying-glass text-gray-400 text-lg"></i>
+            </div>
+            <app-place-autocomplete (placeChanged)="fromValue = $event" placeholder="Destination" class="text-gray-900 text-sm rounded-lg block w-full border border-gray-300"
+                  [(ngModel)]="trip.location" #location="ngModel" name="location" id="location" required />
+          </div>
+          <div [hidden]="location.valid || location.pristine" class="text-red-500 mt-2">Destination is required</div>
+        </div>
+      </div>
+      <div>
+        <p class="w-full text-base text-black">Dates</p>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="relative">
+            <div class="flex items-center">
+              <div class="absolute start-0">
+                <mat-datepicker-toggle matSuffix [for]="startDatePicker" matTooltip="Select start date" />
+                <mat-datepicker #startDatePicker></mat-datepicker>
+              </div>
+              <input name="startDate" id="startDate" matinput [matDatepicker]="startDatePicker" readonly
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full h-12 ps-12 p-2.5"
+                placeholder="Select start date" required [(ngModel)]="trip.start" #startDate="ngModel">
+            </div>
+            <div [hidden]="startDate.valid || startDate.pristine" class="text-red-500 mt-2"
+              *ngIf="startDate.touched && startDate.invalid">Start Date is required</div>
+          </div>
+          <div class="relative">
+            <div class="flex items-center">
+              <div class="absolute start-0">
+                <mat-datepicker-toggle matSuffix [for]="endDatePicker" matTooltip="Select end date" />
+                <mat-datepicker #endDatePicker></mat-datepicker>
+              </div>
+              <input name="endDate" id="endDate" matinput [matDatepicker]="endDatePicker" readonly
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full h-12 ps-12 p-2.5"
+                placeholder="Select end date" required [(ngModel)]="trip.end" #endDate="ngModel">
+            </div>
+            <div [hidden]="endDate.valid || endDate.pristine" class="text-red-500 mt-2"
+              *ngIf="endDate.touched && endDate.invalid">End Date is required</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="my-5">
+        <p class="w-full text-base text-black">Select a type:</p>
+        <select name="type" (change)="selectTripType($event)" [(ngModel)]="selectedTripType"
+          class="block p-4 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:border-gray-800 focus:border-2">
+          <option [value]="undefined">Do not specify</option>
+          <option name="tripType" *ngFor="let tripType of tripTypes" [value]="tripType">
+            {{ tripDetails[tripType].name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="my-5">
+        <p class="w-full text-base text-black">Budget? <input type="checkbox" (change)="ifDelete($event)" name="isCost" id="isCost" [(ngModel)]="isCost" [matTooltip]="isCost ? 'Remove budget': 'Add budget'"></p>
+        <div class="flex" *ngIf="isCost">
+          <div class="relative">
+            <div class="absolute inset-y-0 start-0 top-0 flex items-center ps-3.5 pointer-events-none">
+              <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M5 2a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1M2 5h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" />
+              </svg>
+            </div>
+            <input name="amount" id="amount" type="number" *ngIf="trip.cost"
+              class="block p-2.5 w-full z-20 ps-10 text-sm text-gray-900 bg-gray-50 rounded-s-lg border-e-gray-50 border-e-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter budget amount" [(ngModel)]="trip.cost!.amount" #amount="ngModel">
+            <input name="amount" id="amount" type="number" *ngIf="!trip.cost"
+              class="block p-2.5 w-full z-20 ps-10 text-sm text-gray-900 bg-gray-50 rounded-s-lg border-e-gray-50 border-e-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter budget amount" [(ngModel)]="this.cost!.amount" #amount="ngModel">
+          </div>
+          <select name="currency" #currency="ngModel" id="currency" required (change)="selectCurrency($event)" *ngIf="trip.cost"
+            [(ngModel)]="+trip.cost!.currency"
+            class="flex-shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-e-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 ">
+            <option class="text-left" [value]="undefined" selected>Select a currency</option>
+            <option class="text-left" name="tripType" *ngFor="let currency of currencies" [value]="currency">
+              {{ currencySymbols[currency]  }}</option>
+          </select>
+          <select name="currency" #currency="ngModel" id="currency" required (change)="selectCurrency($event)" *ngIf="!trip.cost"
+            [(ngModel)]="cost!.currency"
+            class="flex-shrink-0 z-10 inline-flex items-center py-2.5 px-4 text-sm font-medium text-center text-gray-900 bg-gray-100 border border-gray-300 rounded-e-lg hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 ">
+            <option class="text-left" [value]="undefined" selected>Select a currency</option>
+            <option class="text-left" name="tripType" *ngFor="let currency of currencies" [value]="currency">
+              {{ currencySymbols[currency]  }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- <div class="mb-6" *ngIf="trip.users">
+        <label for="user" class="w-full text-base text-black">Invite someone (optional):</label>
+        <input type="name" id="user" name="user"
+          class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="example@gmail.com" [(ngModel)]="email" #user="ngModel">
+      </div> -->
+
+      <!-- <div class="mb-6" *ngIf="trip.users">
+      <label for="user" class="block mb-2 text-sm font-medium text-gray-900">Friend email</label>
+      <input type="email" id="user" name="user" 
+        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+        placeholder="example@gmail.com" [(ngModel)]="newFriendEmail">
+      <button type="button" (click)="addFriend()">Add Friend</button>
+    
+      <div *ngFor="let email of usersToAdd; let i = index">
+        {{ email }}
+        <button type="button" (click)="removeFriend(i)">Remove</button>
+      </div>
+    </div> -->
+
+    <button type="submit" [disabled]="!tripForm.form.valid || isSubmitted"
+      [class.cursor-not-allowed]="!tripForm.form.valid" [class.cursor-pointer]="tripForm.form.valid"
+      class="flex w-full mx-auto justify-center px-8 py-5 text-xl font-bold md:px-10 md:py-3 md:text-lg md:w-3/4 bg-accent text-white rounded-xl hover:bg-accent transform hover:scale-105 transition-transform duration-100">
+      Save
+    </button>
+    </form>
+
+    <div class="flex md:w-1/2 w-full">
+      <img src="../../assets/images/World-rafiki.svg" class="w-auto h-auto" />
+    </div>
+  </div>
+</div>
