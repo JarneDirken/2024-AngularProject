@@ -30,6 +30,10 @@ Here's what you can do with our Trip planner:
 
 - **Create an activity**: You can create an activity and add a cost to it as well.
 
+## 🔐 Login
+
+-   **Login as normal user**: `user1@example.com` & `6X^J7w6WMmxKKW`
+
 ## 👩🏽‍🍳 The Process
 
 We started with a project, a trip planner. We went and did research on what most trip planners have / can do. Then we jumped in making a basic layout.
